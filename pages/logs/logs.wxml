@@ -1,6 +1,21 @@
-<!--logs.wxml-->
-<view class="container log-list">
-  <block wx:for="{{logs}}" wx:for-item="log">
-    <text class="log-item">{{index + 1}}. {{log}}</text>
-  </block>
+<view class="page__hd">
+  <view class="page__title">Cookie</view>
+  <view class="page__desc">列表</view>
+</view>
+<view class="page__bd">
+  <view class="weui-cells__title">/otn</view>
+  <view class="weui-cells weui-cells_after-title" wx:for='{{otn}}' wx:key='otn1'>
+    <view class="weui-cell">
+      <view class="weui-cell__hd">{{index}}</view>
+      <view class="weui-cell__bd">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- <view class="weui-cells__title">/passport</view>
+  <view class="weui-cells weui-cells_after-title" wx:for='{{passport}}' wx:key='passport1'>
+    <view class="weui-cell">
+      <view class="weui-cell__bd">{{index}}</view>
+      <view class="weui-cell__ft">{{item}}</view>
+    </view>
+  </view> -->
 </view>
