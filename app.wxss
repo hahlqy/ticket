@@ -1,5 +1,4 @@
-/* @import "/lib/fonts/Ionicons.wxss"; */
-@import "/lib/styles/weui.wxss";
+@import "/styles/weui.wxss";
 
 .main-panel {
   background: #fff;

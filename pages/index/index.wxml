@@ -12,7 +12,7 @@
   <view class='station-select'>
     <view class='station-text'>{{fromStationText}}</view>
     <view>
-      <image class='station-change' src='/images/change.png' />
+      <image class='station-change' src='/assets/change.png' />
       <!-- <canvas id="changeIcon" width="64" height="64"></canvas> -->
     </view>
     <view class='station-text'>{{toStationText}}</view>
@@ -22,7 +22,7 @@
   <view class="train-date">
     <picker mode="date" value="{{date}}" bindchange="bindDateChange">
       <text class='date-tip'>出发日期 <text class='date-importent'>{{train_date}}</text> {{weekDay}}</text>
-      <image class='right' src='/images/right.png' />
+      <image class='right' src='/assets/right.png' />
     </picker>
   </view>
 

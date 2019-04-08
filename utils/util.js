@@ -1,51 +1,104 @@
-const formatTime = date => {
-  const year = date.getFullYear(),
-    month = date.getMonth() + 1,
-    day = date.getDate(),
-    hour = date.getHours(),
-    minute = date.getMinutes(),
-    second = date.getSeconds(),
-    formatNumber = n => {
-      n = n.toString()
-      return n[1] ? n : '0' + n
-    };
-  return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+//  regeneratorRuntime from "../lib/regenerator/runtime-module.js";
+
+const fs = wx.getFileSystemManager();
+
+//判断是否为目录
+const isDirectory = async dirPath => {
+  return await new Promise(resolve => {
+    fs.stat({
+      path: dirPath,
+      success: res => {
+        if (res.stats.isDirectory()) resolve(true);
+        else resolve(false)
+      },
+      fail: res => {
+        console.error(res);
+      }
+    });
+  });
+};
+
+//判断是否为文件类型
+const isFile = async filePath => {
+  return !await isDirectory(filePath);
+};
+
+class Cookie {
+  constructor({
+    domain,
+    expires,
+    maxage,
+    name,
+    path,
+    value
+  } = {}) {
+    this.domain = domain, this.expires = expires, this.maxage = maxage, this.name = name, this.path = path, this.value = value;
+  }
+
+
+}
+Cookie.root = `${wx.env.USER_DATA_PATH}/cookies`;
+Cookie.set = async cookieString => {
+  console.log('setttttttt', cookieString)
+};
+Cookie.get = async path => {
+  console.log('getttttttttttt', Cookie.root)
+};
+
+/* 函数-目录创建 */
+const makeDirectory = dirPath => {
+  return new Promise(resolve => {
+    fs.access({
+      path: dirPath,
+      fail: res => {
+        console.warn(res)
+        resolve(dirPath);
+      }
+    });
+  }).then(_dirPath => {
+    fs.mkdir({
+      dirPath: _dirPath,
+      recursive: true, // invalid
+      fail: res => {
+        console.error(res);
+      }
+    });
+  });
 };
 
 /**
  * 设置Cookie 
  * cookieStringArray = data.header['Set-Cookie'].split(',')
  */
-const setCookies = cookieString => {
+const setCookies = async cookieString => {
   if (cookieString) {
-    const cookieRoot = `${wx.env.USER_DATA_PATH}/cookies`,
-      fs = wx.getFileSystemManager(),
+    const cookiesPath = `${wx.env.USER_DATA_PATH}/cookies`,
       cookieStringArray = cookieString.split(',');
 
     /* 函数-cookie字符串转对象 */
-    const cookieStringParseObject = str => {
+    const cookieStringParseObject = cookieString => {
       let cookieObject = {};
-      if (str) {
+      if (cookieString) {
         //定义正则表达式判断包含属性名
-        const max_AgeReg = RegExp(/Max-Age/i),
+        const maxAgeReg = RegExp(/Max-Age/i),
           expiresReg = RegExp(/Expires/i),
           domainReg = RegExp(/Domain/i),
           pathReg = RegExp(/Path/i);
-        let cookieStrArr = str.split(/;\s?/);
+        let cookieStrArr = cookieString.split(/;\s?/);
         cookieStrArr.forEach(item => {
           let _arr = item.split('='),
             _key = _arr[0],
             _value = _arr[1] || '';
-          if (max_AgeReg.test(_key)) { // max_age
-            cookieObject.max_age = _value;
+          if (maxAgeReg.test(_key)) { // max_age
+            cookieObject['max-age'] = _value;
           } else if (expiresReg.test(_key)) { // expires
-            cookieObject.expires = _value;
+            cookieObject['expires'] = _value;
           } else if (domainReg.test(_key)) { // domain
-            cookieObject.domain = _value;
+            cookieObject['domain'] = _value;
           } else if (pathReg.test(_key)) { // path
-            cookieObject.path = _value;
+            cookieObject['path'] = _value;
           } else {
-            cookieObject.name = _key, cookieObject.value = _value;
+            cookieObject['name'] = _key, cookieObject['value'] = _value;
             // cookieObject[_key] = _value;
           }
         });
@@ -54,150 +107,99 @@ const setCookies = cookieString => {
     };
 
     // 函数-写入cookie文件
-    const setCookie = (obj = {
-      dirPath,
-      fileName,
-      fileText
-    }) => {
+    const setCookie = cookieObj => {
+      let _dirPath = cookieObj.path,
+        _fileName = cookieObj.name,
+        _fileText = `${cookieObj.name}=${cookieObj.value}`;
       fs.writeFile({
-        filePath: `${obj.dirPath}/${obj.fileName}`,
-        data: obj.fileText,
-        success: () => {
-          // console.log(`${obj.dirPath}/${obj.fileName} Cookie文件写入成功`);
-
-          /* Test */
-          // fs.readFile({
-          //   filePath: `${obj.dirPath}/${obj.fileName}`,
-          //   encoding: 'utf8',
-          //   success: res => {
-          //     console.error(res)
-          //   }
-          // });
-        },
-        fail: obj => {
-          console.error(`${obj.dirPath}/${obj.fileName} Cookie文件写入失败`, obj.errMsg);
+        filePath: `${_dirPath}/${_fileName}`,
+        data: _fileText,
+        fail: res => {
+          console.error(`${_dirPath}/${_fileName} Cookie文件写入失败`, res.errMsg);
         }
       });
     };
 
-    /* 函数-判断目录，mkdir是否创建 */
-    const accessDirectory = (dirPath, mkdir) => {
-      try {
-        fs.accessSync(dirPath);
-      } catch (err1) {
-        console.warn(`${dirPath}文件夹不存在，正在创建……`);
-        if (mkdir) {
-          try {
-            fs.mkdirSync(dirPath);
-            console.warn(`${dirPath}文件夹创建成功`);
-            // fs.accessSync(dirPath);
-          } catch (err2) {
-            console.error(`${dirPath}文件夹创建失败`, err2);
-          }
+    /* 循环写入文件 */
+    for (let _cookieString of cookieStringArray) {
+      let _cookieObj = cookieStringParseObject(_cookieString);
+      if (_cookieObj && _cookieObj['path']) {
+        if (_cookieObj['path'] === '/') {
+          _cookieObj['path'] = cookiesPath;
+        } else {
+          _cookieObj['path'] = `${cookiesPath}${_cookieObj['path']}`;
         }
+        await makeDirectory(_cookieObj['path']);
+        console.log('mkdir', _cookieObj['path'])
+        await setCookie(_cookieObj);
+      } else {
+        throw new Error('cookie对象错误!');
       }
-      try {
-        if (!fs.statSync(dirPath).isDirectory()) {
-          throw new Error(`${dirPath}不是目录`);
-        }
-      } catch (err3) {
-        console.error(err3);
-      }
-    };
-
-    /**
-     * 判断cookieRoot目录
-     * 循环>判断目录>存在>>>>>>>>写入文件
-     *              不存在>创建>
-     */
-    accessDirectory(cookieRoot, true);
-    cookieStringArray.forEach(cookieString => {
-      let _cookieObj = cookieStringParseObject(cookieString),
-        _dirPath = `${cookieRoot}${_cookieObj.path === '/' ? '' : _cookieObj.path}`,
-        _fileName = _cookieObj.name,
-        _fileText = `${_cookieObj.name = _cookieObj.value}`;
-
-      //判断此path目录是否存在
-      accessDirectory(_dirPath, true);
-      setCookie({
-        dirPath: _dirPath,
-        fileName: _fileName,
-        fileText: _fileText
-      });
-    });
+    }
   }
 }
 
-/**
- * 获取Cookie数组
- */
-const getCookies = path => {
-  //未传参默认查询根目录
-  if (!path) {
-    path = '/';
-  }
-  let cookieArr = [];
-  const fs = wx.getFileSystemManager(),
-    rootPath = `${wx.env.USER_DATA_PATH}/cookies`;
 
-  /* 函数-获取目录下文件路径，recursive为是否递归子目录 */
-  const readDirFilesPath = (directoryPath, recursive = false) => {
-    //文件路径数组
-    let filesInfo = [];
-    try {
-      //判断directoryPath是否为目录
-      if (fs.statSync(directoryPath).isDirectory) {
-        //读取目录下全部文件并循环
-        fs.readdirSync(directoryPath).forEach(fileName => {
-          // debugger
-          // 文件路径
-          let filePath = `${directoryPath}/${fileName}`;
-          // 判断文件是否为文件夹
-          if (fs.statSync(filePath).isDirectory()) {
-            //是否递归子目录
-            if (recursive) {
-              // 递归
-              filesInfo = filesInfo.concat(readDirFilesPath(fileInfo));
-            }
-          } else { // add
-            filesInfo.push({
-              filePath: filePath,
-              fileName: fileName
-            });
-          }
-        });
-      } else {
-        throw new Error(`${directoryPath}不是目录`);
-      }
-    } catch (errObj) {
-      console.error(errObj);
-    }
-    return filesInfo;
+
+/* 获取Cookie数组 */
+let getCookies = async path => {
+  const COOIKE_PATH = `${wx.env.USER_DATA_PATH}/cookies`,
+    targetPath = `${COOIKE_PATH}${path}`;
+  let cookies = [];
+
+  /**读取文件内容 */
+  let readFile = async(_filePath) => {
+    return await new Promise(resolve => {
+      fs.readFile({
+        filePath: _filePath,
+        encoding: 'utf8',
+        success: res => {
+          resolve(res.data);
+        },
+        fail: res => {
+          resolve(false);
+        }
+      });
+    })
   };
 
-  try {
-    // cookies目录是否存在
-    // fs.accessSync(rootPath);
-    //读取cookies目录下文件
-    let filesInfo = readDirFilesPath(rootPath);
-    // 如果获取的cookie不是cookies下path不是/，path第一位是/
-    if (path.length > 1 && path.charAt(0) === '/') {
-      filesInfo = filesInfo.concat(readDirFilesPath(rootPath + path));
-    }
-    //循环文件路径数组，读取文件并添加到cookie数组
-    filesInfo.forEach(fileInfo => {
-      // console.warn(fileInfo);
-      cookieArr.push(`${fileInfo.fileName}=${fs.readFileSync(fileInfo.filePath, 'utf8')}`);
-    });
-  } catch (errObj) {
-    console.error(errObj)
+  /**获取文件绝对路径 */
+  let getFilesPath = async(_dirPath) => {
+    return await new Promise(resolve => {
+      fs.readdir({
+        dirPath: _dirPath,
+        success: async res => { // Geted the name of all the files 
+          let arr = [];
+          for (let file of res.files) {
+            let absolutePath = `${_dirPath}/${file}`;
+            let stat = await new Promise((resolve, reject) => {
+              fs.stat({
+                path: absolutePath,
+                success: res => {
+                  if (res.stats.isDirectory()) resolve(false);
+                  else resolve(true);
+                }
+              });
+            });
+            if (stat) arr.push(absolutePath);
+          }
+          resolve(arr);
+        }
+      });
+    })
   }
-  return cookieArr;
+
+  let paths = await getFilesPath(COOIKE_PATH);
+  if (COOIKE_PATH !== targetPath) paths = paths.concat(await getFilesPath(targetPath));
+  for (let path of paths) {
+    let content = await readFile(path);
+    if (content)
+      cookies.push(content);
+  }
+  return cookies;
 };
 
-/**
- * 验证码序号转坐标
- */
+/* 验证码序号转坐标 */
 const captchaSequenceNumberToCoordinate = sequenceNumber => {
   let coordinateArr = [];
   if (sequenceNumber) {
@@ -236,9 +238,7 @@ const captchaSequenceNumberToCoordinate = sequenceNumber => {
   return coordinateArr;
 };
 
-/**
- * input数据双向绑定
- */
+/* input数据双向绑定 */
 const inputBindData = function(e) {
   // console.log(e.currentTarget.dataset.key);
   let key = e.currentTarget.dataset.key;
@@ -251,75 +251,105 @@ const inputBindData = function(e) {
 
 };
 
-const request = (param = {
-  url,
-  data,
-  header,
-  method: 'GET',
-  success
-}) => {
-  let _header = {
-    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-  };
-  Object.assign(_header, param.header);
+/* 网络请求 */
+const request = ({
+  _url,
+  _data,
+  _header = {},
+  _method = 'GET',
+  _success
+} = {}) => {
+  _header = Object.assign(_header, {
+    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8', // 默认表单格式
+    // cookie: getCookies('/' + urlReg(_url)[4].split('/')[1]).join('; ') // TODO 获取一级path下Cookie数组并用; 连接
+  });
   wx.request({
-    url: param.url,
-    data: param.data,
+    url: _url,
+    data: _data,
     header: _header,
-    method: param.method,
+    method: _method,
     dataType: 'json',
     responseType: 'text',
-    success: function(res) {},
+    success: function(res) {
+      if (res.header['Set-Cookie']) {
+        setCookies(res.header['Set-Cookie']); //保存cookie
+      }
+      _success(res.data); //返回数据
+    },
     fail: function(res) {},
     complete: function(res) {
-      if (res.statusCode === 200) {
-        param.success(res);
-      } else {
-        console.error(res);
-      }
+      console.warn(_url, res);
     },
   })
 };
 
+/* 正则匹配url */
+const urlReg = (url) => {
+  const reg = /^(https?:\/\/)([0-9a-z.]+)(:[0-9]+)?([/0-9a-z.-]+)?(\?[0-9a-z&=]+)?(#[0-9-a-z]+)?/i;
+  // urlArr = ['完整URL', '协议', '地址', '端口', '路径', '查询', '锚点']
+  let urlArr = reg.exec(url);
+  return urlArr;
+}
+
 module.exports = {
-  formatTime: formatTime,
+  Cookie: Cookie,
   setCookies: setCookies,
   getCookies: getCookies,
   captchaSequenceNumberToCoordinate: captchaSequenceNumberToCoordinate,
   inputBindData: inputBindData,
+  // urlReg: urlReg,
+  makeDirectory: makeDirectory,
   request: request
 }
 
-/** 纪念第一次写回调函数*/
-// 判断文件/目录是否存在(异步))
-// let accessDir = (obj = {
-//   dirPath, // 路径
-//   success, // 成功回调
-//   faild // 失败回调
-// }) => {
-//   fs.access({
-//     path: obj.dirPath + "",
-//     success: () => {
-//       console.log(`${obj.dirPath} 目录存在哦，做什么都可以哦`);
-//       obj.success();
-//     },
-//     fail: errMsg => {
-//       console.error(`MMP，${obj.dirPath} 目录不存在，还得创建目录`, errMsg);
-//       // 创建目录
-//       fs.mkdir({
-//         dirPath: obj.dirPath,
-//         success: () => {
-//           console.log(`${obj.dirPath} 目录创建完了，该干嘛干嘛去吧。`);
-//           obj.success();
-//         },
-//         fail: obj => {
-//           console.error(`我*，创建个 ${obj.dirPath} 目录都能失败，你已经死了。`, obj);
-//           obj.fail({
-//             errMsg: "失败了"
-//           });
-//         }
-//       });
+
+/* ES6 */
+// export {
+//   formatTime,
+//   setCookies,
+//   getCookies,
+//   captchaSequenceNumberToCoordinate,
+//   inputBindData,
+//   // urlReg,
+//   makeDirectory,
+//   request
+// };
+
+// backup
+// let readFilesInDirectory = (absolutePath, recursive) => {
+//   let arr = [];
+//   fs.readdir({
+//     dirPath: absolutePath,
+//     success: res => {
+//       console.log('进入readdir path:', absolutePath)
+//       res.files.forEach(file => {
+//         console.log('files循环', file)
+//         let _absolutePath = `${absolutePath}/${file}`
+//         fs.stat({
+//           path: _absolutePath,
+//           recursive: false, // 坑，无效参数 
+//           success: res => {
+//             console.log(`${file}文件类型是否为目录`, res.stats.isDirectory())
+//             if (res.stats.isDirectory()) {
+//               console.log('进入文件夹')
+//               // reject(_absolutePath, recursive);
+//               arr.concat(readFilesInDirectory(_absolutePath, recursive));
+//             } else {
+//               console.log(`读取文件:${_absolutePath}`)
+//               fs.readFile({
+//                 filePath: _absolutePath,
+//                 encoding: 'utf8',
+//                 success: res => {
+//                   console.log('文件内容', res.data)
+//                   arr.push(res.data);
+//                 }
+//               });
+//             }
+//           }
+//         });
+//       })
 //     }
 //   });
-
-// };
+//   console.log("result", arr)
+//   return arr;
+// }
