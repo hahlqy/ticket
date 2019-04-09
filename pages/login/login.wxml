@@ -39,7 +39,7 @@
       <view class="weui-label">验证码</view>
     </view>
     <view class="weui-cell__bd">
-      <input class="weui-input" placeholder="请输入验证码" data-key='answer' bindinput='inputBindData' value='{{answer}}' />
+      <input class="weui-input" type='number' placeholder="请输入验证码" data-key='answer' bindinput='inputBindData' value='{{answer}}' />
     </view>
     <view class="weui-cell__ft">
       <view class="weui-vcode-btn" bindtap='bindGetCaptcha'>刷新验证码</view>

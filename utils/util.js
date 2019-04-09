@@ -1,28 +1,3 @@
-//  regeneratorRuntime from "../lib/regenerator/runtime-module.js";
-
-const fs = wx.getFileSystemManager();
-
-//判断是否为目录
-const isDirectory = async dirPath => {
-  return await new Promise(resolve => {
-    fs.stat({
-      path: dirPath,
-      success: res => {
-        if (res.stats.isDirectory()) resolve(true);
-        else resolve(false)
-      },
-      fail: res => {
-        console.error(res);
-      }
-    });
-  });
-};
-
-//判断是否为文件类型
-const isFile = async filePath => {
-  return !await isDirectory(filePath);
-};
-
 class Cookie {
   constructor({
     domain,
@@ -34,169 +9,103 @@ class Cookie {
   } = {}) {
     this.domain = domain, this.expires = expires, this.maxage = maxage, this.name = name, this.path = path, this.value = value;
   }
-
-
+  getValue() {
+    return `${this.name}=${this.value}`;
+  }
 }
-Cookie.root = `${wx.env.USER_DATA_PATH}/cookies`;
-Cookie.set = async cookieString => {
-  console.log('setttttttt', cookieString)
-};
-Cookie.get = async path => {
-  console.log('getttttttttttt', Cookie.root)
-};
-
-/* 函数-目录创建 */
-const makeDirectory = dirPath => {
-  return new Promise(resolve => {
-    fs.access({
-      path: dirPath,
-      fail: res => {
-        console.warn(res)
-        resolve(dirPath);
-      }
-    });
-  }).then(_dirPath => {
-    fs.mkdir({
-      dirPath: _dirPath,
-      recursive: true, // invalid
-      fail: res => {
-        console.error(res);
-      }
-    });
-  });
-};
-
-/**
- * 设置Cookie 
- * cookieStringArray = data.header['Set-Cookie'].split(',')
- */
-const setCookies = async cookieString => {
-  if (cookieString) {
-    const cookiesPath = `${wx.env.USER_DATA_PATH}/cookies`,
-      cookieStringArray = cookieString.split(',');
-
-    /* 函数-cookie字符串转对象 */
-    const cookieStringParseObject = cookieString => {
-      let cookieObject = {};
-      if (cookieString) {
-        //定义正则表达式判断包含属性名
-        const maxAgeReg = RegExp(/Max-Age/i),
-          expiresReg = RegExp(/Expires/i),
-          domainReg = RegExp(/Domain/i),
-          pathReg = RegExp(/Path/i);
-        let cookieStrArr = cookieString.split(/;\s?/);
-        cookieStrArr.forEach(item => {
-          let _arr = item.split('='),
-            _key = _arr[0],
-            _value = _arr[1] || '';
-          if (maxAgeReg.test(_key)) { // max_age
-            cookieObject['max-age'] = _value;
-          } else if (expiresReg.test(_key)) { // expires
-            cookieObject['expires'] = _value;
-          } else if (domainReg.test(_key)) { // domain
-            cookieObject['domain'] = _value;
-          } else if (pathReg.test(_key)) { // path
-            cookieObject['path'] = _value;
-          } else {
-            cookieObject['name'] = _key, cookieObject['value'] = _value;
-            // cookieObject[_key] = _value;
-          }
-        });
-      }
-      return cookieObject;
-    };
-
-    // 函数-写入cookie文件
-    const setCookie = cookieObj => {
-      let _dirPath = cookieObj.path,
-        _fileName = cookieObj.name,
-        _fileText = `${cookieObj.name}=${cookieObj.value}`;
-      fs.writeFile({
-        filePath: `${_dirPath}/${_fileName}`,
-        data: _fileText,
-        fail: res => {
-          console.error(`${_dirPath}/${_fileName} Cookie文件写入失败`, res.errMsg);
-        }
-      });
-    };
-
-    /* 循环写入文件 */
-    for (let _cookieString of cookieStringArray) {
-      let _cookieObj = cookieStringParseObject(_cookieString);
-      if (_cookieObj && _cookieObj['path']) {
-        if (_cookieObj['path'] === '/') {
-          _cookieObj['path'] = cookiesPath;
-        } else {
-          _cookieObj['path'] = `${cookiesPath}${_cookieObj['path']}`;
-        }
-        await makeDirectory(_cookieObj['path']);
-        console.log('mkdir', _cookieObj['path'])
-        await setCookie(_cookieObj);
-      } else {
-        throw new Error('cookie对象错误!');
-      }
+//http 响应头中Set-Cookie值强行转对象
+Cookie.parse = cookieString => {
+  if (!!cookieString) {
+    //return obj
+    let data = {};
+    let start, end, exppires; //expires起始位置,expires结束位置,expires字符串
+    if ((start = cookieString.indexOf('\x20Expires')) >= 0) {
+      // debugger
+      end = cookieString.indexOf('\x3b', start) + 1,
+        exppires = cookieString.substring(start, end);
+      cookieString = cookieString.replace(exppires, ''); //删除expires，因为星期后包含逗号 分割后格式错误，反正存在max-age 有它没它无所谓
     }
-  }
-}
+    //强行拼成jsonString用JSON.parse转成对象
+    //,分割.map(item.trim()前拼接{"后拼接"};替换",")
+    let cookieObjArr = cookieString.split('\x2c').map(item => `\x7b\x22${item.trim()}\x22\x7d`.replace(/\x3b/g, '\x22\x2c\x22').replace(/\x3d/g, '\x22\x3a\x22')).map(JSON.parse);
+    // console.warn('cookieString changed', cookieObjArr);
+    //遍历数组
+    for (let _o of cookieObjArr) {
+      let _cookie = new Cookie();
+      //遍历对象
+      for (let _k in _o) {
+        // 正则匹配
+        if (/Domain/i.test(_k)) _cookie.domain = _o[_k];
+        else if (/Expires/i.test(_k)) _cookie.expires = _o[_k];
+        else if (/Max-Age/i.test(_k)) _cookie.maxage = _o[_k];
+        else if (/Path/i.test(_k)) _cookie.path = _o[_k];
+        else _cookie.name = _k, _cookie.value = _o[_k];
+      }
+      // 添加到返回值
+      if (!!data[_cookie.path]) data[_cookie.path].push(_cookie);
+      else data[_cookie.path] = [_cookie];
+    }
+    return data;
+  } else throw new Error('Parameter cookieString invalid');
+};
 
-
-
-/* 获取Cookie数组 */
-let getCookies = async path => {
-  const COOIKE_PATH = `${wx.env.USER_DATA_PATH}/cookies`,
-    targetPath = `${COOIKE_PATH}${path}`;
-  let cookies = [];
-
-  /**读取文件内容 */
-  let readFile = async(_filePath) => {
-    return await new Promise(resolve => {
-      fs.readFile({
-        filePath: _filePath,
-        encoding: 'utf8',
-        success: res => {
-          resolve(res.data);
-        },
-        fail: res => {
-          resolve(false);
-        }
-      });
-    })
-  };
-
-  /**获取文件绝对路径 */
-  let getFilesPath = async(_dirPath) => {
-    return await new Promise(resolve => {
-      fs.readdir({
-        dirPath: _dirPath,
-        success: async res => { // Geted the name of all the files 
-          let arr = [];
-          for (let file of res.files) {
-            let absolutePath = `${_dirPath}/${file}`;
-            let stat = await new Promise((resolve, reject) => {
-              fs.stat({
-                path: absolutePath,
-                success: res => {
-                  if (res.stats.isDirectory()) resolve(false);
-                  else resolve(true);
-                }
-              });
-            });
-            if (stat) arr.push(absolutePath);
+//添加cookie
+let setCookie = cookieString => {
+  let obj = Cookie.parse(cookieString);
+  // console.warn(obj)
+  if (!!obj) {
+    for (let _path in obj) {
+      //新数据数组
+      let _newData = obj[_path];
+      wx.getStorage({
+        key: _path,
+        success(res) { //
+          //复制旧数据数组
+          let _oldData = res.data.concat();
+          _flag: for (let i = 0; i < _oldData.length; i++) {
+            for (let j = 0; j < _newData.length; j++) {
+              if (_oldData[i].name === _newData[j].name) _oldData.splice(i, 1); //相同删除旧数组对象
+              if (_oldData.length === i) break _flag; //删除后长度等于当前下标说明已经到数组最后继续执行会越界
+            }
           }
-          resolve(arr);
+          _newData = _newData.concat(_oldData);
+          wx.setStorage({
+            key: _path,
+            data: _newData,
+            success: console.log, //
+            fail: console.error //
+          });
+        },
+        fail: res => { //获取失败说明未存储
+          // debugger
+          wx.setStorage({
+            key: _path,
+            data: _newData,
+            success: console.log, //
+            fail: console.error //
+          });
         }
-      });
-    })
+      })
+    };
   }
+};
 
-  let paths = await getFilesPath(COOIKE_PATH);
-  if (COOIKE_PATH !== targetPath) paths = paths.concat(await getFilesPath(targetPath));
-  for (let path of paths) {
-    let content = await readFile(path);
-    if (content)
-      cookies.push(content);
+// 获取Cookie根据path，默认返回/路径下Cookie
+let getCookie = path => {
+  let _get = path => {
+    // debugger
+    // let data = wx.getStorageSync(path);
+    return wx.getStorageSync(path);
+  };
+  let data = _get('/');
+  if (!!path && path !== '/') data = data.concat(_get(path));
+
+  if (data) {
+    console.log(data);
+    let cookie = data.map(item => new Cookie(item).getValue()).join('; ')
+
+    return cookie;
   }
-  return cookies;
 };
 
 /* 验证码序号转坐标 */
@@ -260,9 +169,11 @@ const request = ({
   _success
 } = {}) => {
   _header = Object.assign(_header, {
-    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8', // 默认表单格式
-    // cookie: getCookies('/' + urlReg(_url)[4].split('/')[1]).join('; ') // TODO 获取一级path下Cookie数组并用; 连接
+    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' // 默认表单格式
   });
+  console.error('path','/' + urlReg(_url)[4].split('/')[1] || '')
+  let cookie = getCookie('/' + urlReg(_url)[4].split('/')[1] || '') // TODO 获取一级path
+  if (cookie) _header.cookie = cookie;
   wx.request({
     url: _url,
     data: _data,
@@ -272,7 +183,7 @@ const request = ({
     responseType: 'text',
     success: function(res) {
       if (res.header['Set-Cookie']) {
-        setCookies(res.header['Set-Cookie']); //保存cookie
+        setCookie(res.header['Set-Cookie']); //保存cookie
       }
       _success(res.data); //返回数据
     },
@@ -293,63 +204,10 @@ const urlReg = (url) => {
 
 module.exports = {
   Cookie: Cookie,
-  setCookies: setCookies,
-  getCookies: getCookies,
+  setCookie: setCookie,
+  getCookie: getCookie,
   captchaSequenceNumberToCoordinate: captchaSequenceNumberToCoordinate,
   inputBindData: inputBindData,
   // urlReg: urlReg,
-  makeDirectory: makeDirectory,
   request: request
 }
-
-
-/* ES6 */
-// export {
-//   formatTime,
-//   setCookies,
-//   getCookies,
-//   captchaSequenceNumberToCoordinate,
-//   inputBindData,
-//   // urlReg,
-//   makeDirectory,
-//   request
-// };
-
-// backup
-// let readFilesInDirectory = (absolutePath, recursive) => {
-//   let arr = [];
-//   fs.readdir({
-//     dirPath: absolutePath,
-//     success: res => {
-//       console.log('进入readdir path:', absolutePath)
-//       res.files.forEach(file => {
-//         console.log('files循环', file)
-//         let _absolutePath = `${absolutePath}/${file}`
-//         fs.stat({
-//           path: _absolutePath,
-//           recursive: false, // 坑，无效参数 
-//           success: res => {
-//             console.log(`${file}文件类型是否为目录`, res.stats.isDirectory())
-//             if (res.stats.isDirectory()) {
-//               console.log('进入文件夹')
-//               // reject(_absolutePath, recursive);
-//               arr.concat(readFilesInDirectory(_absolutePath, recursive));
-//             } else {
-//               console.log(`读取文件:${_absolutePath}`)
-//               fs.readFile({
-//                 filePath: _absolutePath,
-//                 encoding: 'utf8',
-//                 success: res => {
-//                   console.log('文件内容', res.data)
-//                   arr.push(res.data);
-//                 }
-//               });
-//             }
-//           }
-//         });
-//       })
-//     }
-//   });
-//   console.log("result", arr)
-//   return arr;
-// }
