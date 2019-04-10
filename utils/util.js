@@ -101,9 +101,8 @@ let getCookie = path => {
   if (!!path && path !== '/') data = data.concat(_get(path));
 
   if (data) {
-    console.log(data);
     let cookie = data.map(item => new Cookie(item).getValue()).join('; ')
-
+    // console.log(data);
     return cookie;
   }
 };
@@ -149,29 +148,26 @@ const captchaSequenceNumberToCoordinate = sequenceNumber => {
 
 /* input数据双向绑定 */
 const inputBindData = function(e) {
-  // console.log(e.currentTarget.dataset.key);
-  let key = e.currentTarget.dataset.key;
-  // console.log(this.data[key]);
+  let property = e.currentTarget.dataset.property;
   // 对象动态属性名
   this.setData({
-    [key]: e.detail.value
+    [property]: e.detail.value
   });
-  // console.log(this.data[key]);
-
 };
 
 /* 网络请求 */
 const request = ({
-  _url,
-  _data,
-  _header = {},
-  _method = 'GET',
-  _success
+  url: _url,
+  data: _data,
+  header: _header = {},
+  method: _method = 'GET',
+  success: _success,
+  fail: _fail
 } = {}) => {
   _header = Object.assign(_header, {
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' // 默认表单格式
   });
-  console.error('path','/' + urlReg(_url)[4].split('/')[1] || '')
+  // debugger
   let cookie = getCookie('/' + urlReg(_url)[4].split('/')[1] || '') // TODO 获取一级path
   if (cookie) _header.cookie = cookie;
   wx.request({

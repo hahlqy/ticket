@@ -16,14 +16,14 @@
   </view>
 
 </view> -->
-
+<view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">错误提示</view>
 <view class="weui-cells weui-cells_after-title">
   <view class="weui-cell weui-cell_input">
     <view class="weui-cell__hd">
       <view class="weui-label">用户</view>
     </view>
     <view class="weui-cell__bd">
-      <input class="weui-input" placeholder="请输入用户名/邮箱/手机号码" data-key="username" bindinput='inputBindData' value='{{username}}' />
+      <input class="weui-input" placeholder="请输入用户名/邮箱/手机号码" data-property="username" bindinput='inputBindData' value='{{username}}' />
     </view>
   </view>
   <view class="weui-cell weui-cell_input weui-cell_vcode">
@@ -31,7 +31,7 @@
       <view class="weui-label">密码</view>
     </view>
     <view class="weui-cell__bd">
-      <input class="weui-input" password='true' placeholder="请输入密码" data-key="password" bindinput='inputBindData' value='{{password}}' />
+      <input class="weui-input" password='true' placeholder="请输入密码" data-property="password" bindinput='inputBindData' value='{{password}}' />
     </view>
   </view>
   <view class="weui-cell weui-cell_input weui-cell_vcode">
@@ -39,7 +39,7 @@
       <view class="weui-label">验证码</view>
     </view>
     <view class="weui-cell__bd">
-      <input class="weui-input" type='number' placeholder="请输入验证码" data-key='answer' bindinput='inputBindData' value='{{answer}}' />
+      <input class="weui-input" type='number' placeholder="请输入验证码" data-property='answer' bindinput='inputBindData' value='{{answer}}' />
     </view>
     <view class="weui-cell__ft">
       <view class="weui-vcode-btn" bindtap='bindGetCaptcha'>刷新验证码</view>

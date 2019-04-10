@@ -5,7 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    t: null
   },
 
   /**
@@ -14,38 +14,38 @@ Page({
   onLoad: function(options) {
     let _this = this;
     // 设置
-    util.request({
-      _url: 'https://kyfw.12306.cn/otn/login/conf',
-      _method: 'POST',
-      _success: data => {
-        // console.warn('conf', data)
-        _this.data.conf = data;
-      }
-    });
-    // 火车站名
-    util.request({
-      _url: 'https://kyfw.12306.cn/otn/resources/js/framework/station_name.js',
-      _success: data => {
-        data.substring(data.indexOf('@') + 1, data.lastIndexOf('\'')).split('@').forEach(item => {
-          let name = item.split('|');
+    // util.request({
+    //   _url: 'https://kyfw.12306.cn/otn/login/conf',
+    //   _method: 'POST',
+    //   _success: data => {
+    //     // console.warn('conf', data)
+    //     _this.data.conf = data;
+    //   }
+    // });
+    // // 火车站名
+    // util.request({
+    //   _url: 'https://kyfw.12306.cn/otn/resources/js/framework/station_name.js',
+    //   _success: data => {
+    //     data.substring(data.indexOf('@') + 1, data.lastIndexOf('\'')).split('@').forEach(item => {
+    //       let name = item.split('|');
 
-          _this.data.station_names.push(name);
-        });
-        // console.log(_this.data.station_names)
-      }
-    });
-    //热门车站
-    util.request({
-      _url: 'https://kyfw.12306.cn/otn/resources/js/framework/favorite_name.js',
-      _success: data => {
-        data.substring(data.indexOf('@') + 1, data.lastIndexOf('\'')).split('@').forEach(item => {
-          let name = item.split('|');
+    //       _this.data.station_names.push(name);
+    //     });
+    //     // console.log(_this.data.station_names)
+    //   }
+    // });
+    // //热门车站
+    // util.request({
+    //   _url: 'https://kyfw.12306.cn/otn/resources/js/framework/favorite_name.js',
+    //   _success: data => {
+    //     data.substring(data.indexOf('@') + 1, data.lastIndexOf('\'')).split('@').forEach(item => {
+    //       let name = item.split('|');
 
-          _this.data.favorite_names.push(name);
-        });
-        // console.log(_this.data.station_names)
-      }
-    });
+    //       _this.data.favorite_names.push(name);
+    //     });
+    //     // console.log(_this.data.station_names)
+    //   }
+    // });
 
     // 写入cookie
     // util.request({
@@ -86,12 +86,12 @@ Page({
     //自己请求的不行 可能跟request head的referer有关
     // util.setCookies(`RAIL_EXPIRATION=1554608366457; path=/,RAIL_DEVICEID=Pp52n7u3o7Hb9nZKTLHtzHh3UDWwDhig_H-26yJCASqneQf8u-zBaupzvguHBRmroIAvVdekZXH-4Rv1tNDyBRHstRTg7G_1GdU2-j-V-JbEpPJsZHBFOExvoOVBzY-udh9ywpPVXAhZk9eW0ZyGR6R_i3BtgWse; path=/`);
     // 不知道干嘛的 站名：时间
-    util.request({
-      _url: 'https://www.12306.cn/index/script/core/common/qss_v10026.js',
-      _success: data => {
-        _this.data.citys = JSON.parse(data.substr(data.indexOf('{')))
-      }
-    });
+    // util.request({
+    //   _url: 'https://www.12306.cn/index/script/core/common/qss_v10026.js',
+    //   _success: data => {
+    //     _this.data.citys = JSON.parse(data.substr(data.indexOf('{')))
+    //   }
+    // });
 
   },
 
@@ -100,6 +100,18 @@ Page({
    */
   onReady: function() {
     console.log('test/index onReady')
+    // let i = 0,
+    //   t = setInterval(() => {
+    //     console.log('start')
+    //     util.request({
+    //       _url: 'https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2019-04-10&leftTicketDTO.from_station=BJP&leftTicketDTO.to_station=HBB&purpose_codes=ADULT',
+    //       _success: data => {
+    //         console.log('geted', data)
+    //       }
+    //     });
+    //     i++;
+    //   }, 100);
+   
   },
 
   /**
