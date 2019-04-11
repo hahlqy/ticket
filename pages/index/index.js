@@ -1,5 +1,5 @@
 // import * as util from '../../utils/util.js';
-const util = require('../../utils/util.js');
+const util = require('../../common/util.js');
 //获取应用实例
 const app = getApp();
 

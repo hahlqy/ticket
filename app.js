@@ -1,4 +1,4 @@
-const util = require('/utils/util.js');
+const util = require('./common/util.js');
 App({
   onLaunch: async function(options) {
     //index页加载
@@ -12,7 +12,9 @@ App({
     });
     util.request({
       url: 'https://www.12306.cn/index/script/core/common/station_name_v10027.js',
-      success: data => {}
+      success: data => {
+        console.log(data);
+      }
     });
     util.request({
       url: 'https://www.12306.cn/index/script/dist/index/main_v10001',

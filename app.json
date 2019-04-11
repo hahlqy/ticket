@@ -1,12 +1,12 @@
 {
   "pages": [
+    "pages/index/station/station",
     "pages/index/index",
-    "pages/test/index",
     "pages/order/order",
     "pages/mine/mine",
-    "pages/mine/login",
-    "pages/common/question",
-    "pages/common/logs"
+    "pages/mine/login/login",
+    "pages/mine/question/question",
+    "pages/mine/logs/logs"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FFF",

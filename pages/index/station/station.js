@@ -1,46 +1,33 @@
-const util = require('../../common/util.js');
-
+// pages/index/station.js
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    isLogin: false
+
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    let _this = this;
-    util.request({
-      url: 'https://kyfw.12306.cn/passport/web/auth/uamtk',
-      method: 'POST',
-      data: {
-        appid: 'otn'
-      },
-      success: data => {
-        // debugger
-        if (data.result_code === 0) {
-          util.request({
-            url: 'https://kyfw.12306.cn/otn/uamauthclient',
-            method: 'POST',
-            data: {
-              tk: data.newapptk
-            },
-            success: data => {
-              if (data.result_code === 0) _this.setData({
-                isLogin: true,
-                username: data.username
-              });
-            }
-          });
-        } else {
-          _this.data.isLogin = false;
+    let station_name_list = [],
+      station_name_array = station_names.split("@"),
+      letter = new Array("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z");
+    for (let i = 0; i < 26; i++) {
+      station_name_list[i] = [];
+    }
+    for (let i = 1; i < station_name_array.length; i++) {
+      let current_station_name = station_name_array[i];
+      let first_letter = current_station_name.charAt(0);
+      for (let j in letter) {
+        if (first_letter === letter[j]) {
+          station_name_list[j].push(current_station_name.split("|"))
         }
       }
-    });
+    }
+    // TODO 数据展示***************************************************
   },
 
   /**
