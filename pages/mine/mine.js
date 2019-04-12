@@ -6,7 +6,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isLogin: false
+    isLogin: false,
+    username: ''
   },
 
   /**
@@ -19,26 +20,24 @@ Page({
       method: 'POST',
       data: {
         appid: 'otn'
-      },
-      success: data => {
-        // debugger
-        if (data.result_code === 0) {
-          util.request({
-            url: 'https://kyfw.12306.cn/otn/uamauthclient',
-            method: 'POST',
-            data: {
-              tk: data.newapptk
-            },
-            success: data => {
-              if (data.result_code === 0) _this.setData({
-                isLogin: true,
-                username: data.username
-              });
-            }
+      }
+    }).then(res => {
+      if (res.data.result_code === 0) {
+        util.request({
+          url: 'https://kyfw.12306.cn/otn/uamauthclient',
+          method: 'POST',
+          data: {
+            tk: res.data.newapptk
+          }
+        }).then(res => {
+          console.log(res)
+          if (res.data.result_code === 0) _this.setData({
+            isLogin: true,
+            username: res.data.username
           });
-        } else {
-          _this.data.isLogin = false;
-        }
+        });
+      } else {
+        _this.data.isLogin = false;
       }
     });
   },

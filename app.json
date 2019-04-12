@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/index/station/station",
     "pages/index/index",
+    "pages/index/station/station",
     "pages/order/order",
     "pages/mine/mine",
     "pages/mine/login/login",
