@@ -99,5 +99,5 @@ Page({
     // 获取验证码
     this.bindGetCaptcha();
   },
-  inputBindData: util.inputBindData
+  inputTyping: util.inputTyping
 })

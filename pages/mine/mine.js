@@ -1,5 +1,5 @@
 const util = require('../../common/util.js');
-
+// TODO 我页清缓存按钮
 Page({
 
   /**

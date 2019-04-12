@@ -10,12 +10,16 @@
 
   <!-- 站地选择 -->
   <view class='station-select'>
-    <view class='station-text'>{{fromStationText}}</view>
+    <view class='station-text'>
+      <navigator url="./station/station?p=l">{{fromStationText}}</navigator>
+    </view>
     <view>
       <image class='station-change' src='/assets/change.png' />
       <!-- <canvas id="changeIcon" width="64" height="64"></canvas> -->
     </view>
-    <view class='station-text'>{{toStationText}}</view>
+    <view class='station-text'>
+      <navigator url="./station/station?p=r">{{toStationText}}</navigator>
+    </view>
   </view>
 
   <!-- 时间选择 -->

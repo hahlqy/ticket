@@ -2,8 +2,8 @@
   <view class="weui-search-bar__form">
     <view class="weui-search-bar__box">
       <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
-      <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}" bindinput="inputTyping" />
-      <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+      <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{input_val}}" focus="{{inputShowed}}" bindblur='inputUnfocus' bindinput="inputTyping" data-property="input_val" />
+      <view class="weui-icon-clear" wx:if="{{input_val.length > 0}}" bindtap="clearInput">
         <icon type="clear" size="14"></icon>
       </view>
     </view>
@@ -14,37 +14,25 @@
   </view>
   <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
 </view>
-<view class="weui-cells searchbar-result" wx:if="{{inputVal.length > 0}}">
-  <navigator url="" class="weui-cell" hover-class="weui-cell_active">
+
+<view class="weui-cells searchbar-result" wx:if="{{input_val.length > 0}}">
+  <navigator url="../index?p={{position}}&text={{item[1]}}&code={{item[2]}}" open-type="redirect" class="weui-cell" hover-class="weui-cell_active" wx:for="{{search_result_arr}}" wx:key="{{item[5]}}">
     <view class="weui-cell__bd">
-      <view>实时搜索文本</view>
-    </view>
-  </navigator>
-  <navigator url="" class="weui-cell" hover-class="weui-cell_active">
-    <view class="weui-cell__bd">
-      <view>实时搜索文本</view>
-    </view>
-  </navigator>
-  <navigator url="" class="weui-cell" hover-class="weui-cell_active">
-    <view class="weui-cell__bd">
-      <view>实时搜索文本</view>
-    </view>
-  </navigator>
-  <navigator url="" class="weui-cell" hover-class="weui-cell_active">
-    <view class="weui-cell__bd">
-      <view>实时搜索文本</view>
+      <view>{{item[1]}}</view>
     </view>
   </navigator>
 </view>
 
-<view class="weui-cells__title">带跳转的列表项</view>
-<view class="weui-cells weui-cells_after-title">
-  <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-    <view class="weui-cell__bd">cell standard</view>
-    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-  </navigator>
-  <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-    <view class="weui-cell__bd">cell standard</view>
-    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-  </navigator>
-</view>
+
+
+<block wx:if="{{!inputShowed}}" wx:for="{{station_name_arr}}" wx:key="{{letter_arr[index]}}" wx:for-item="first_litter_station_arr">
+  <view class="weui-cells__title">{{letter_arr[index]}}</view>
+  <view class="weui-cells weui-cells_after-title">
+    <block wx:if="{{first_litter_station_arr.length>0}}" wx:for="{{first_litter_station_arr}}" wx:key="{{station[5]}}" wx:for-item="station">
+      <navigator url="../index?p={{position}}&text={{station[1]}}&code={{station[2]}}" open-type="redirect" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+        <view class="weui-cell__bd">{{station[1]}}</view>
+        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+      </navigator>
+    </block>
+  </view>
+</block>

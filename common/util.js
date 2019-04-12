@@ -1,5 +1,5 @@
 /** input数据双向绑定 */
-const inputBindData = function(e) {
+const inputTyping = function(e) {
   // 对象动态属性名
   let property = e.currentTarget.dataset['property'];
   //设置页面data对象的属性值
@@ -237,11 +237,11 @@ const request = ({
 
 
 module.exports = {
+  inputTyping: inputTyping,
   Cookie: Cookie,
   setCookie: setCookie,
   getCookie: getCookie,
   captchaSequenceNumberToCoordinate: captchaSequenceNumberToCoordinate,
-  inputBindData: inputBindData,
   // urlReg: urlReg,
   request: request
 }

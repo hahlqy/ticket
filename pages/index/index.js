@@ -7,12 +7,10 @@ const weeks = ["周日", "周一", "周二", "周三", "周四", "周五", "周�
 
 Page({
   data: {
-    citys: {},
-    station_names: [],
-    favorite_names: [],
-
     fromStationText: "北京",
     toStationText: "成都",
+    fromStationCode: '',
+    toStationCode: '',
     date: new Date(),
     train_date: (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日", //出发时间
     weekDay: weeks[new Date().getDay()], //周几    
@@ -49,9 +47,20 @@ Page({
   },
   // 事件处理函数
   // onLoad	Function	生命周期回调—监听页面加载
-  onLoad: function() {
+  onLoad: function(options) {
+    debugger
     app.globalData.pageStart = new Date().getTime();
-
+    if (options.p && options.p === 'l') {
+      this.setData({
+        fromStationText: options.text,
+        fromStationCode: options.code
+      });
+    } else if (options.p && options.p === 'r') {
+      this.setData({
+        toStationText: options.text,
+        toStationCode: options.code
+      });
+    }
   },
   // onShow	Function	生命周期回调—监听页面显示
 })

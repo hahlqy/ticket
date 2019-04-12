@@ -35,9 +35,9 @@ Page({
     });
   },
   //文本域输入函数
-  inputBindData: function(e) {
+  inputTyping: function(e) {
     //反向绑定数据
-    util.inputBindData.call(this, e);
+    util.inputTyping.call(this, e);
     //验证文本
     this.textCheck(this.data.pageText);
     //文本长度修改

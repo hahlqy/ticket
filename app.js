@@ -1,6 +1,9 @@
-const util = require('./common/util.js');
+const util = require('./common/util.js'),
+  constant = require('./common/constant.js');
+
 App({
   onLaunch: async function(options) {
+    // test
     util.setCookie([new util.Cookie({
       path: '/',
       name: 'RAIL_EXPIRATION',
@@ -20,9 +23,34 @@ App({
     util.request({
       url: 'https://www.12306.cn/index/script/core/common/qss_v10026.js'
     });
-    util.request({
-      url: 'https://www.12306.cn/index/script/core/common/station_name_v10027.js'
+
+    /* 车站信息 */
+    wx.getStorage({
+      key: 'station_names',
+      fail: res => { //没有缓存重新获取
+        util.request({
+          url: 'https://www.12306.cn/index/script/core/common/station_name_v10027.js'
+        }).then(res => {
+          let station_names = [],
+            station_names_str = res.data.slice(res.data.indexOf('\x40') + 1, res.data.lastIndexOf('\x27')), //@' 截取需要数据
+            station_name_arr = station_names_str.split('@'); //分割
+          // debugger
+          for (let _i = 0; _i < 26; _i++) station_names[_i] = [];
+          for (let _i = 0; _i < station_name_arr.length; _i++) {
+            for (let _j in constant.LETTERS) {
+              if (station_name_arr[_i].charAt(0) === constant.LETTERS[_j]) station_names[_j].push(station_name_arr[_i].split("|")); // 首字母相同保存到字母组
+            }
+          }
+          // console.log(station_names)
+          // 缓存
+          wx.setStorage({
+            key: 'station_names',
+            data: station_names
+          });
+        });
+      },
     });
+
     util.request({
       url: 'https://www.12306.cn/index/script/dist/index/main_v10001.js'
     });
@@ -182,6 +210,7 @@ App({
   globalData: {
     startTime: new Date().getTime(), //"window.onload外开始时间:",window.startTime
     pageStart: 0
+
   }
 
 })
