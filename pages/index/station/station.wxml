@@ -16,7 +16,7 @@
 </view>
 
 <view class="weui-cells searchbar-result" wx:if="{{input_val.length > 0}}">
-  <navigator url="../index?p={{position}}&text={{item[1]}}&code={{item[2]}}" open-type="redirect" class="weui-cell" hover-class="weui-cell_active" wx:for="{{search_result_arr}}" wx:key="{{item[5]}}">
+  <navigator url="#" class="weui-cell" hover-class="weui-cell_active" wx:for="{{search_result_arr}}" wx:key="{{item[5]}}" data-value="{{item}}" bindtap='selected'>
     <view class="weui-cell__bd">
       <view>{{item[1]}}</view>
     </view>
@@ -29,10 +29,10 @@
   <view class="weui-cells__title">{{letter_arr[index]}}</view>
   <view class="weui-cells weui-cells_after-title">
     <block wx:if="{{first_litter_station_arr.length>0}}" wx:for="{{first_litter_station_arr}}" wx:key="{{station[5]}}" wx:for-item="station">
-      <navigator url="../index?p={{position}}&text={{station[1]}}&code={{station[2]}}" open-type="redirect" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+      <view class="weui-cell weui-cell_access" hover-class="weui-cell_active" data-value="{{station}}" bindtap='selected'>
         <view class="weui-cell__bd">{{station[1]}}</view>
         <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-      </navigator>
+      </view>
     </block>
   </view>
 </block>

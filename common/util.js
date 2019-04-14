@@ -1,16 +1,35 @@
+/** 炒的时间转换函数 */
+Date.prototype.format = function(fmt) {
+  let o = {
+    "M+": this.getMonth() + 1, //月份 
+    "d+": this.getDate(), //日 
+    "h+": this.getHours(), //小时 
+    "m+": this.getMinutes(), //分 
+    "s+": this.getSeconds(), //秒 
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+    "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  }
+  for (let k in o) {
+    if (new RegExp("(" + k + ")").test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    }
+  }
+  return fmt;
+}
 /** input数据双向绑定 */
 const inputTyping = function(e) {
-  // 对象动态属性名
-  let property = e.currentTarget.dataset['property'];
-  //设置页面data对象的属性值
+  //对象动态属性名 设置页面data对象的属性值
   this.setData({
-    [property]: e.detail.value
+    [e.currentTarget.dataset['property']]: e.detail.value
   });
 };
 
 /* 正则匹配url */
 const urlReg = (url) => {
-  const reg = /^(https?:\/\/)?([0-9a-z.]+)(:[0-9]+)?([/0-9a-z.-]+)?(\?[0-9a-z&=]+)?(#[0-9-a-z]+)?/i;
+  const reg = /^(https?:\/\/)?([0-9a-z.]+)(:[0-9]+)?([\/0-9a-z.-]+)?(\?[0-9a-z&=]+)?(#[0-9-a-z]+)?/i;
   // urlArr = ['all URL', '协议', 'domain', 'port', 'path', 'param', '锚点'];
   let urlArr = reg.exec(url);
   return urlArr;
@@ -19,10 +38,11 @@ const urlReg = (url) => {
 /* 验证码序号转坐标 */
 const captchaSequenceNumberToCoordinate = sequenceNumber => {
   let coordinateArr = [];
-  if (!sequenceNumber) return '';
-  else {
-    sequenceNumber.split('').forEach(item => {
-      switch (item) {
+  if (!sequenceNumber) {
+    return '';
+  } else {
+    sequenceNumber.split('').forEach(_item => {
+      switch (_item) {
         case '1':
           coordinateArr.push('38\x2c74');
           break;
@@ -51,7 +71,7 @@ const captchaSequenceNumberToCoordinate = sequenceNumber => {
           throw new Error('请输入1~8以内数字');
       }
     });
-    return coordinateArr.join('\x2c');
+    return coordinateArr.join('\x2c'); // ,
   }
 };
 
@@ -85,8 +105,9 @@ Cookie.parse = (cookie_str, default_domain) => {
     // expires起始位置,expires结束位置,expires字符串
     let exppires_start_index, exppires_end_index, exppires_str;
     // \x20为= \x3b为;
-    if ((exppires_start_index = cookie_str.indexOf('\x20Expires')) >= 0) exppires_end_index = cookie_str.indexOf('\x3b', exppires_start_index) + 1, exppires_str = cookie_str.substring(exppires_start_index, exppires_end_index), cookie_str = cookie_str.replace(exppires_str, '');
-
+    if ((exppires_start_index = cookie_str.indexOf('\x20Expires')) >= 0) {
+      exppires_end_index = cookie_str.indexOf('\x3b', exppires_start_index) + 1, exppires_str = cookie_str.substring(exppires_start_index, exppires_end_index), cookie_str = cookie_str.replace(exppires_str, '');
+    }
     // 强行拼成jsonString用JSON.parse转成对象数组
     // 按,分割.map(item去空格 ;替换"," 前拼接{" 后拼接"} )
     let object_arr = cookie_str.split('\x2c').map(item => `\x7b\x22${item.trim().replace(/\x3b/g, '\x22\x2c\x22').replace(/\x3d/g, '\x22\x3a\x22')}\x22\x7d`).map(JSON.parse);
@@ -96,19 +117,27 @@ Cookie.parse = (cookie_str, default_domain) => {
       //遍历对象
       for (let _p in object_arr[_i]) {
         // 正则匹配属性赋值
-        if (/Domain/i.test(_p)) cookie_arr[_i].domain = object_arr[_i][_p];
-        // else if (/Expires/i.test(_p)) cookie_arr[_i].expires = object_arr[_i][_p];
-        else if (/Max-Age/i.test(_p)) cookie_arr[_i].maxage = object_arr[_i][_p];
-        else if (/Path/i.test(_p)) cookie_arr[_i].path = object_arr[_i][_p];
-        else cookie_arr[_i].name = _p, cookie_arr[_i].value = object_arr[_i][_p];
+        if (/Domain/i.test(_p)) {
+          cookie_arr[_i].domain = object_arr[_i][_p];
+        }
+        // else if (/Expires/i.test(_p)) { cookie_arr[_i].expires = object_arr[_i][_p];}
+        else if (/Max-Age/i.test(_p)) {
+          cookie_arr[_i].maxage = object_arr[_i][_p];
+        } else if (/Path/i.test(_p)) {
+          cookie_arr[_i].path = object_arr[_i][_p];
+        } else {
+          cookie_arr[_i].name = _p, cookie_arr[_i].value = object_arr[_i][_p];
+        }
       }
-      if (!cookie_arr[_i].domain && default_domain) cookie_arr[_i].domain = default_domain.replace(/^w{3}./, '');
-      else throw new Error(`${cookie_arr[_i].name} has no domain attribute!`);
+      if (!cookie_arr[_i].domain && default_domain) {
+        cookie_arr[_i].domain = default_domain.replace(/^w{3}./, '');
+      } else {
+        throw new Error(`${cookie_arr[_i].name} has no domain attribute!`);
+      }
     }
     return cookie_arr;
   } else throw new Error(`Invalid parameter ${cookie_str}!`);
 };
-
 
 //添加cookie
 let setCookie = cookies => { //Set-Cookie格式字符串|Cookie对象数组|Cookie对象
@@ -116,7 +145,7 @@ let setCookie = cookies => { //Set-Cookie格式字符串|Cookie对象数组|Cook
   if (cookies instanceof Array) new_cookie_arr = cookies;
   else if (cookies instanceof Cookie) new_cookie_arr.push(cookies);
   else throw new Error('Invalid parameter!')
-  // debugger
+
   new Promise((resolve, reject) => {
     wx.getStorage({
       key: 'cookies',
@@ -198,6 +227,36 @@ const request = ({
   header: _header = {},
   method: _method = 'GET'
 } = {}) => {
+  /** 对象转uri参数格式字符串 传入字符串返回原值 */
+  const parseData = (obj) => {
+    let parse = (obj, key) => {
+      // 循环值对象
+      for (let _key in obj) {
+        //判断是否为对象
+        if (obj[_key] instanceof Object) {
+          //递归 并合并返回值
+          Object.assign(obj, parse(obj[_key], `${key}.${_key}`));
+        } else {
+          //按父对象键点子对象键 格式拼装
+          obj[`${key}.${_key}`] = obj[_key];
+        }
+        //无论如何都要删
+        delete obj[_key]
+      }
+      return obj;
+    };
+
+    // 遍历对象 获取key
+    for (let _key in obj) {
+      //判断对象值类型
+      if (obj[_key] instanceof Object) {
+        Object.assign(obj, parse(obj[_key], _key));
+        delete obj[_key];
+      }
+    }
+    return obj;
+  };
+  //先按url获取cookie然后拼装请求参数然后执行网络请求
   return new Promise((resolve, reject) => {
     getCookie({
       domain: urlReg(_url)[2],
@@ -206,30 +265,29 @@ const request = ({
       return {
         data: {
           url: _url,
-          data: _data,
+          data: parseData(_data),
           header: Object.assign(_header, {
             cookie: res.data,
-            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' // 默认表单格式
+            // 默认表单格式
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
           }),
-          method: _method,
+          method: _method.toUpperCase(),
           dataType: 'json',
           responseType: 'text'
         }
       };
     }).then(res => { //请求
-      let param = Object.assign(res.data, {
+      //合并参数和和回调函数
+      wx.request(Object.assign(res.data, {
         success: res => {
           if (res.header['Set-Cookie']) setCookie(Cookie.parse(res.header['Set-Cookie'], urlReg(_url)[2])); //保存cookie
-          resolve({
-            data: res.data
-          });
+          resolve(res.data);
         },
         fail: res => {
           console.error(res.errMsg);
           reject(res);
         }
-      });
-      wx.request(param);
+      }));
     });
   });
 };

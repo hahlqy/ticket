@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/index/station/station",
+    "pages/index/query/query",
     "pages/order/order",
     "pages/mine/mine",
     "pages/mine/login/login",

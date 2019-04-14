@@ -22,18 +22,17 @@ Page({
         appid: 'otn'
       }
     }).then(res => {
-      if (res.data.result_code === 0) {
+      if (res.result_code === 0) {
         util.request({
           url: 'https://kyfw.12306.cn/otn/uamauthclient',
           method: 'POST',
           data: {
-            tk: res.data.newapptk
+            tk: res.newapptk
           }
         }).then(res => {
-          console.log(res)
-          if (res.data.result_code === 0) _this.setData({
+          if (res.result_code === 0) _this.setData({
             isLogin: true,
-            username: res.data.username
+            username: res.username
           });
         });
       } else {

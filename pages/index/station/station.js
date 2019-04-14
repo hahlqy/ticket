@@ -1,9 +1,8 @@
-const util = require('../../../common/util.js'),
-  constant = require('../../../common/constant.js');
-
+const util = require('../../../common/util.js');
+const app = getApp();
 Page({
   data: {
-    position: '',
+    i: 0,
     input_val: '',
     inputShowed: false,
     search_result_arr: [],
@@ -19,18 +18,17 @@ Page({
       success: res => {
         _this.setData({
           station_name_arr: res.data,
-          letter_arr: constant.LETTERS,
-          position: options.p
+          letter_arr: app.globalData.LETTERS,
+          i: options.i
         });
-       
+
       }
     });
-
     // let start = new Date().getTime();
     // console.log(new Date().getTime() - start)
   },
-  onShow:function(){
-    wx.hideNavigationBarLoading();
+  onShow: function() {
+    // wx.hideNavigationBarLoading();
   },
   // 输入反向绑定，匹配关键字
   inputTyping: function(e) {
@@ -61,9 +59,9 @@ Page({
       // 匹配输入的数据为字母
       if (/[a-zA-Z]+/.test(input_val)) {
         // 遍历26个字母的数组
-        for (let _i in constant.LETTERS) {
+        for (let _i in app.globalData.LETTERS) {
           //输入数据的第一个字母匹配获取字母下标
-          if (input_val.charAt(0) === constant.LETTERS[_i]) {
+          if (input_val.charAt(0) === app.globalData.LETTERS[_i]) {
             //获取字母下标的车站数组赋值给备选数组
             candidate_arr = this.data.station_name_arr[_i];
             //匹配到就停止循环
@@ -126,6 +124,7 @@ Page({
       inputShowed: false
     });
   },
+  //查询栏为空 点击空白隐藏查询栏
   inputUnfocus: function(e) {
     if (!e.detail.value) {
       this.setData({
@@ -138,6 +137,48 @@ Page({
     this.setData({
       input_val: ''
     });
+  },
+  selected: function(e) {
+    new Promise((resolve, reject) => {
+      let _this = this,
+        val = e.currentTarget.dataset['value'],
+        data = [];
+      wx.getStorage({
+        key: 'station_selected',
+        success: res => {
+          data = data.concat(res.data);
+          data[_this.data.i] = val;
+          resolve({
+            data: data
+          })
+        },
+        fail: res => {
+          data[_this.data.i] = val;
+          resolve({
+            data: data
+          });
+        }
+      })
+    }).then(res => {
+      return new Promise((resolve, reject) => {
+        wx.setStorage({
+          key: 'station_selected',
+          data: res.data,
+          success: resolve,
+          fail: reject
+        });
+      });
+    }).then((res) => {
+      if (res.errMsg.search('ok')) {
+        wx.navigateBack({
+          delta: 1
+        });
+      } else {
+        throw new Error(res.errMsg)
+        // TODO 顶部警告
+      }
+    });
+
   }
 
 

@@ -25,19 +25,17 @@ Page({
       }
     }).then(res => {
       _this.setData({
-        base64image: `data:image/jpg;base64,${res.data.image}`,
+        base64image: `data:image/jpg;base64,${res.image}`,
         answer: ''
       });
     })
   },
-  bindLogin:  function() {
+  bindLogin: function() {
     let _this = this,
       _username = this.data.username,
       _password = this.data.password,
-      _answer = util.captchaSequenceNumberToCoordinate(this.data.answer).catch(res => {
+      _answer = util.captchaSequenceNumberToCoordinate(this.data.answer)
 
-      });
-      debugger
     util.request({
       url: `https://kyfw.12306.cn/passport/captcha/captcha-check`,
       data: {
@@ -46,7 +44,7 @@ Page({
         rand: 'sjrand'
       }
     }).then(res => {
-      if (res.data.result_code === '4') {
+      if (res.result_code === '4') {
         util.request({
           url: 'https://kyfw.12306.cn/passport/web/login',
           data: {
@@ -58,16 +56,16 @@ Page({
           method: 'POST'
         }).then(res => {
           let _icon = 'none';
-          if (res.data.result_code === 0) {
+          if (res.result_code === 0) {
             _icon = 'success';
-          } else /*if (res.data.result_code === 1)*/ {
+          } else /*if (res.result_code === 1)*/ {
             _this.setData({
               password: '',
               answer: ''
             });
           }
           wx.showToast({
-            title: res.data.result_message,
+            title: res.result_message,
             icon: _icon,
             mask: true
           });
@@ -83,7 +81,7 @@ Page({
           answer: ''
         });
         wx.showToast({
-          title: res.data.result_message,
+          title: res.result_message,
           icon: 'none'
         });
       }

@@ -3,64 +3,99 @@ const util = require('../../common/util.js');
 //获取应用实例
 const app = getApp();
 
-const weeks = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-
 Page({
   data: {
-    fromStationText: "北京",
-    toStationText: "成都",
-    fromStationCode: '',
-    toStationCode: '',
-    date: new Date(),
-    train_date: (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日", //出发时间
-    weekDay: weeks[new Date().getDay()], //周几    
-    isG: false, //只看高铁
-    isStudent: false //学生票
+    from_station_text: '出发地',
+    to_station_text: '目的地',
+    show_date: ((new Date).getMonth() + 1) + "月" + (new Date).getDate() + "日", //出发时间
+    weekDay: app.globalData.WEEKS[(new Date).getDay()], //周几    
+    isH: false, //只看高铁
+    isS: false, //学生票
+    visableS: false, //学生票按钮
+
+    train_date: (new Date).format('yyyy-MM-dd'), //出发日期 默认当天
+    from_station: '', //出发地代码
+    to_station: '', //目的地代码
+    purpose_codes: this.isS ? '' : 'ADULT' //学生票 成人票
+
   },
   // 绑定时间转换函数
-  bindDateChange(e) {
-    let date = e.detail.value.split('-');
-    let newDate = date[0] + "-" + date[1] + "-" + date[2];
+  fnDateChange(e) {
     this.setData({
-      date: newDate,
-      train_date: (date[1] * 1) + "月" + date[2] + "日",
-      weekDay: weeks[new Date(date[0], (date[1] * 1 - 1), date[2]).getDay()]
+      train_date: e.detail.value,
+      show_date: (new Date(e.detail.value).getMonth() + 1) + "月" + new Date(e.detail.value).getDate() + "日",
+      weekDay: app.globalData.WEEKS[new Date(e.detail.value).getDay()]
     });
   },
   //只查高铁选项
-  bindOnlyGChange(e) {
+  fnOnlyHightSpeedRailChange(e) {
     this.setData({
-      isG: !!e.detail.value.length
+      isH: !!e.detail.value.length
     });
   },
   // 学生票选项
-  bindStudentTicketChange(e) {
+  fnStudentTicketChange(e) {
     this.setData({
-      isStudent: !!e.detail.value.length
+      isS: !!e.detail.value.length
     });
   },
-  bindQuery() {
-    // console.log(util.getCookies('/'))
+  //查询按钮函数
+  fnQuery() {
+    wx.redirectTo({
+      url: './query/query',
+    })
   },
-  changeIcon() {
-    const ctx = wx.createCanvasContext('changeIcon');
-  },
-  // 事件处理函数
-  // onLoad	Function	生命周期回调—监听页面加载
   onLoad: function(options) {
-    debugger
-    app.globalData.pageStart = new Date().getTime();
-    if (options.p && options.p === 'l') {
-      this.setData({
-        fromStationText: options.text,
-        fromStationCode: options.code
-      });
-    } else if (options.p && options.p === 'r') {
-      this.setData({
-        toStationText: options.text,
-        toStationCode: options.code
-      });
-    }
+    /* 判断车站信息缓存 */
+    wx.getStorage({
+      key: 'station_names',
+      fail: res => { //没有缓存重新获取
+        util.request({
+          //12306使用jsonp返回值为js代码
+          url: 'https://www.12306.cn/index/script/core/common/station_name_v10027.js'
+        }).then(res => {
+          //保存站地数组
+          let station_names = [],
+            //@' 截取需要数据
+            station_names_str = res.slice(res.indexOf('\x40') + 1, res.lastIndexOf('\x27')),
+            //@分割
+            station_name_arr = station_names_str.split('\x40');
+          for (let _i = 0; _i < 26; _i++) station_names[_i] = [];
+          for (let _i = 0; _i < station_name_arr.length; _i++) {
+            for (let _j in app.globalData.LETTERS) {
+              if (station_name_arr[_i].charAt(0) === app.globalData.LETTERS[_j]) station_names[_j].push(station_name_arr[_i].split("\x7c")); // | 首字母相同保存到字母组
+            }
+          }
+          // 缓存
+          wx.setStorage({
+            key: 'station_names',
+            data: station_names
+          });
+        });
+      },
+    });
+
   },
-  // onShow	Function	生命周期回调—监听页面显示
+  onShow: function() {
+    let _this = this;
+    // 获取选择的站地信息
+    wx.getStorage({
+      key: 'station_selected',
+      success: res => {
+        let _from = res.data[0] ? res.data[0] : [],
+          _to = res.data[1] ? res.data[1] : [];
+        _this.setData({
+          from_station: _from[2] || this.data.leftTicketDTO.from_station,
+          to_station: _to[2] || this.data.leftTicketDTO.to_station,
+          from_station_text: _from[1] || this.data.from_station_text,
+          to_station_text: _to[1] || this.data.to_station_text
+        });
+      }
+    });
+  },
+  //对调图标函数
+  changeIcon() {
+    // TODO canvas画对调图标和童话
+    const ctx = wx.createCanvasContext('changeIcon');
+  }
 })

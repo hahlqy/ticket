@@ -8,9 +8,8 @@
     <view class="weui-navbar__slider" style="width:{{sliderWidth}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
   </view>
   <view class="weui-tab__panel">
-    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">这里显示全部订单啊</view>
-    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">此处显示未支付的订单</view>
-    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">这是已经支付过的订单</view>
-    <view class="weui-tab__content" hidden="{{activeIndex != 3}}">显示自己的车票吧</view>
+    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">这里显示未支付的订单啊</view>
+    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">此处显示未出行的订单</view>
+    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">这是历史订单</view>
   </view>
 </view>

@@ -1,8 +1,8 @@
 <!-- 轮播图 -->
-<swiper>
-  <swiper-item>广告位1</swiper-item>
-  <swiper-item>广告位2</swiper-item>
-  <swiper-item>广告位3</swiper-item>
+<swiper indicator-dots="true" autoplay="true" interval="5000" circular="true">
+  <swiper-item>轮播图1</swiper-item>
+  <swiper-item>轮播图2</swiper-item>
+  <swiper-item>轮播图3</swiper-item>
 </swiper>
 
 <!-- 中间面板 -->
@@ -11,21 +11,21 @@
   <!-- 站地选择 -->
   <view class='station-select'>
     <view class='station-text'>
-      <navigator url="./station/station?p=l">{{fromStationText}}</navigator>
+      <navigator url="./station/station?i=0">{{from_station_text}}</navigator>
     </view>
     <view>
       <image class='station-change' src='/assets/change.png' />
       <!-- <canvas id="changeIcon" width="64" height="64"></canvas> -->
     </view>
     <view class='station-text'>
-      <navigator url="./station/station?p=r">{{toStationText}}</navigator>
+      <navigator url="./station/station?i=1">{{to_station_text}}</navigator>
     </view>
   </view>
 
   <!-- 时间选择 -->
   <view class="train-date">
-    <picker mode="date" value="{{date}}" bindchange="bindDateChange">
-      <text class='date-tip'>出发日期 <text class='date-importent'>{{train_date}}</text> {{weekDay}}</text>
+    <picker mode="date" value="{{date}}" bindchange="fnDateChange">
+      <text class='date-tip'>出发日期 <text class='date-importent'>{{show_date}}</text> {{weekDay}}</text>
       <image class='right' src='/assets/right.png' />
     </picker>
   </view>
@@ -34,7 +34,7 @@
   <view class='train-options'>
     <!-- 只看高铁 -->
     <label class='train-option' for='onlyG'>
-      <checkbox-group bindchange="bindOnlyGChange">
+      <checkbox-group bindchange="fnOnlyGChange">
         <checkbox class="weui-agree__checkbox" id="onlyG" value="G" />
         <view class="weui-agree__checkbox-icon">
           <icon class="weui-agree__checkbox-icon-check" type="success_no_circle" size="9" wx:if="{{isG}}"></icon>
@@ -44,7 +44,7 @@
     </label>
     <!-- 学生票 -->
     <label class='train-option' for='studentTicket'>
-      <checkbox-group bindchange="bindStudentTicketChange">
+      <checkbox-group bindchange="fnStudentTicketChange">
         <checkbox class="weui-agree__checkbox" id="studentTicket" value="student" />
         <view class="weui-agree__checkbox-icon">
           <icon class="weui-agree__checkbox-icon-check" type="success_no_circle" size="9" wx:if="{{isStudent}}"></icon>
@@ -55,7 +55,7 @@
   </view>
   <!-- 查询按钮 -->
   <view class="weui-btn-area">
-    <button class="weui-btn" type="primary" bindtap="bindQuery">查询</button>
+    <button class="weui-btn" type="primary" bindtap="fnQuery">查询</button>
   </view>
 
   <view>这是12306 app 的布局</view>
@@ -63,5 +63,5 @@
 </view>
 
 <view class="main">
-  没有广告，不知道放什么
+  不知道放什么
 </view>
