@@ -9,3 +9,12 @@
 
 # 放票相关时间
 [8684文章](https://huoche.8684.cn/331)
+
+# wxss
+[微信小程序wxss设置样式](https://www.cnblogs.com/yang-shuai/p/6899430.html)
+
+# 按住抬起（滑动）事件
+[小程序-监听手势滑动](https://blog.csdn.net/male09/article/details/81236607)
+
+# template
+[微信小程序 template添加点击事件](https://blog.csdn.net/wangcheng_/article/details/79764584)

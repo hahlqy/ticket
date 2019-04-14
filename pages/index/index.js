@@ -1,46 +1,33 @@
 // import * as util from '../../utils/util.js';
-const util = require('../../common/util.js');
+const util = require('../../common/util.js'),
+  template = require('../../common/template/template.js');
 //获取应用实例
 const app = getApp();
 
 Page({
   data: {
-    from_station_text: '出发地',
-    to_station_text: '目的地',
-    show_date: ((new Date).getMonth() + 1) + "月" + (new Date).getDate() + "日", //出发时间
-    weekDay: app.globalData.WEEKS[(new Date).getDay()], //周几    
-    isH: false, //只看高铁
-    isS: false, //学生票
-    visableS: false, //学生票按钮
+    visibleStationLayer: false, //站地选择弹出层
+    visibleDateLayer: false, //显示日期选择弹层
+    visableStudentTicket: true, //学生票按钮
+
+    fromStationText: '出发地', //出发地显示文本
+    toStationText: '目的地', //目的地显示文本
+    showDate: {
+      // year: (new Date).getFullYear(),
+      month: app.globalData.MONTH[(new Date).getMonth()],
+      date: (new Date).getDate(),
+      week: app.globalData.WEEKS[(new Date).getDay()]
+    }, //出发时间
+    studentTicketValue: 'student', //学生票checkbox的值
 
     train_date: (new Date).format('yyyy-MM-dd'), //出发日期 默认当天
     from_station: '', //出发地代码
     to_station: '', //目的地代码
-    purpose_codes: this.isS ? '' : 'ADULT' //学生票 成人票
+    purpose_codes: 'ADULT' //学生票 成人票
 
   },
-  // 绑定时间转换函数
-  fnDateChange(e) {
-    this.setData({
-      train_date: e.detail.value,
-      show_date: (new Date(e.detail.value).getMonth() + 1) + "月" + new Date(e.detail.value).getDate() + "日",
-      weekDay: app.globalData.WEEKS[new Date(e.detail.value).getDay()]
-    });
-  },
-  //只查高铁选项
-  fnOnlyHightSpeedRailChange(e) {
-    this.setData({
-      isH: !!e.detail.value.length
-    });
-  },
-  // 学生票选项
-  fnStudentTicketChange(e) {
-    this.setData({
-      isS: !!e.detail.value.length
-    });
-  },
   //查询按钮函数
-  fnQuery() {
+  fnQueryTicket() {
     wx.redirectTo({
       url: './query/query',
     })
@@ -49,7 +36,8 @@ Page({
     /* 判断车站信息缓存 */
     wx.getStorage({
       key: 'station_names',
-      fail: res => { //没有缓存重新获取
+      //没有缓存重新获取
+      fail: res => {
         util.request({
           //12306使用jsonp返回值为js代码
           url: 'https://www.12306.cn/index/script/core/common/station_name_v10027.js'
@@ -72,9 +60,8 @@ Page({
             data: station_names
           });
         });
-      },
+      }
     });
-
   },
   onShow: function() {
     let _this = this;
@@ -85,17 +72,49 @@ Page({
         let _from = res.data[0] ? res.data[0] : [],
           _to = res.data[1] ? res.data[1] : [];
         _this.setData({
-          from_station: _from[2] || this.data.leftTicketDTO.from_station,
-          to_station: _to[2] || this.data.leftTicketDTO.to_station,
-          from_station_text: _from[1] || this.data.from_station_text,
-          to_station_text: _to[1] || this.data.to_station_text
+          from_station: _from[2] || this.data.from_station,
+          to_station: _to[2] || this.data.to_station,
+          fromStation_text: _from[1] || this.data.fromStationText,
+          toStationText: _to[1] || this.data.toStationText
         });
       }
     });
   },
-  //对调图标函数
-  changeIcon() {
-    // TODO canvas画对调图标和童话
-    const ctx = wx.createCanvasContext('changeIcon');
+  //选择站点
+  fnAppearStationlayer(e) {
+    this.setData({
+      test: '1111111'
+    });
+    console.log(this.data.test)
+    this.setData({
+      visibleStationLayer: true
+    });
+  },
+  fnPickedStation(e) {
+    template.fnPickedStation.call(this, e);
+  },
+  // 选择时间
+  fnAppearDateLayer(e) {
+    this.setData({
+      visibleDateLayer: true
+    });
+  },
+  //选择日期
+  fnPickedDate(e) {
+    template.fnPickedDate.call(this, e);
+  },
+  //标记触摸x坐标
+  fnMarkTouchPoint(e) {
+    template.fnMarkTouchPoint.call(this, e);
+  },
+  //→滑动关闭弹出层
+  fnSlideClose(e) {
+    template.fnSlideClose.call(this, e);
+  },
+  // 学生票选项
+  fnStudentTicketChange(e) {
+    this.setData({
+      purpose_codes: e.detail.value[0] || 'ADULT'
+    });
   }
 })

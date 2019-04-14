@@ -1,67 +1,52 @@
-<!-- 轮播图 -->
-<swiper indicator-dots="true" autoplay="true" interval="5000" circular="true">
-  <swiper-item>轮播图1</swiper-item>
-  <swiper-item>轮播图2</swiper-item>
-  <swiper-item>轮播图3</swiper-item>
-</swiper>
-
-<!-- 中间面板 -->
-<view class="main-panel">
-
-  <!-- 站地选择 -->
-  <view class='station-select'>
-    <view class='station-text'>
-      <navigator url="./station/station?i=0">{{from_station_text}}</navigator>
-    </view>
-    <view>
-      <image class='station-change' src='/assets/change.png' />
-      <!-- <canvas id="changeIcon" width="64" height="64"></canvas> -->
-    </view>
-    <view class='station-text'>
-      <navigator url="./station/station?i=1">{{to_station_text}}</navigator>
-    </view>
-  </view>
-
-  <!-- 时间选择 -->
-  <view class="train-date">
-    <picker mode="date" value="{{date}}" bindchange="fnDateChange">
-      <text class='date-tip'>出发日期 <text class='date-importent'>{{show_date}}</text> {{weekDay}}</text>
-      <image class='right' src='/assets/right.png' />
-    </picker>
-  </view>
-
-  <!-- 买票选项checkbox -->
-  <view class='train-options'>
-    <!-- 只看高铁 -->
-    <label class='train-option' for='onlyG'>
-      <checkbox-group bindchange="fnOnlyGChange">
-        <checkbox class="weui-agree__checkbox" id="onlyG" value="G" />
-        <view class="weui-agree__checkbox-icon">
-          <icon class="weui-agree__checkbox-icon-check" type="success_no_circle" size="9" wx:if="{{isG}}"></icon>
+<view class="page">
+  <swiper indicator-dots="true" autoplay="true" interval="5000" circular="true">
+    <swiper-item>轮播图1</swiper-item>
+    <swiper-item>轮播图2</swiper-item>
+    <swiper-item>轮播图3</swiper-item>
+  </swiper>
+  <view class="main">
+    <view class="options">
+      <view class="weui-flex">
+        <view class="weui-flex__item option" date-property="from" bindtap='fnAppearStationlayer'>
+          <view class="option-title">搁哪走？</view>
+          <view class="option-station l-animation_jack">{{fromStationText}}</view>
         </view>
-        只看高铁
-      </checkbox-group>
-    </label>
-    <!-- 学生票 -->
-    <label class='train-option' for='studentTicket'>
-      <checkbox-group bindchange="fnStudentTicketChange">
-        <checkbox class="weui-agree__checkbox" id="studentTicket" value="student" />
-        <view class="weui-agree__checkbox-icon">
-          <icon class="weui-agree__checkbox-icon-check" type="success_no_circle" size="9" wx:if="{{isStudent}}"></icon>
+        <view class="station-change">
+          <icon class="iconfont icon-change"></icon>
         </view>
-        学生票
-      </checkbox-group>
-    </label>
+      </view>
+      <view class="weui-flex">
+        <view class="weui-flex__item option" date-property="to" bindtap='fnAppearStationlayer'>
+          <view class="option-title">往哪去？</view>
+          <view class="option-station">{{toStationText}}</view>
+        </view>
+      </view>
+      <view class="weui-flex">
+        <view class="weui-flex__item option" bindtap="fnAppearDateLayer">
+          <view class="option-title">啥钱儿走?</view>
+          <view class="option-trip_date">
+            <view> {{showDate.date}}</view>
+            <view>{{showDate.month}}月</view>
+            <view>{{showDate.week}}</view>
+          </view>
+        </view>
+        <view class="weui-flex__item option_other">
+          <view class="option-title">烂糟的</view>
+          <view class="option-student_ticket">
+            <checkbox-group bindchange="fnStudentTicketChange">
+              <checkbox id="studentTicket" value='{{studentTicketValue}}' disabled="{{visibleStudentTicket}}"></checkbox>
+              <label for="studentTicket">学生票</label>
+            </checkbox-group>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="search">
+      <button class='btn' hover-class='btn-hover'>查询</button>
+    </view>
   </view>
-  <!-- 查询按钮 -->
-  <view class="weui-btn-area">
-    <button class="weui-btn" type="primary" bindtap="fnQuery">查询</button>
-  </view>
-
-  <view>这是12306 app 的布局</view>
-
 </view>
 
-<view class="main">
-  不知道放什么
-</view>
+<import src="../../common/template/template.wxml"></import>
+<template is="dateLayer" data="{{visibleDateLayer}}"></template>
+<template is="stationLayer" data="{{visibleStationLayer}}"></template>

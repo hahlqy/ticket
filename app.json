@@ -10,23 +10,23 @@
     "pages/mine/logs/logs"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#FFF",
+    "navigationBarBackgroundColor": "#fff",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "一生帮你抢票吧",
     "navigationStyle": "default",
-    "backgroundColor": "#FFF",
+    "backgroundColor": "#fff",
     "backgroundTextStyle": "dark",
-    "backgroundColorTop": "#FFF",
-    "backgroundColorBottom": "#FFF",
+    "backgroundColorTop": "#fff",
+    "backgroundColorBottom": "#fff",
     "enablePullDownRefresh": true,
     "onReachBottomDistance": 50,
     "pageOrientation": "auto"
   },
   "tabBar": {
-    "color": "#808080",
-    "selectedColor": "#179B16",
+    "color": "#888",
+    "selectedColor": "#000",
     "backgroundColor": "",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",

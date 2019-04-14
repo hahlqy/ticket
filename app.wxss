@@ -1,4 +1,44 @@
-@import "/styles/weui.wxss";
+@import "./common/weui.wxss";
+
+@font-face {
+  font-family: 'iconfont'; /* project id 1141042 */
+  src: url('//at.alicdn.com/t/font_1141042_wbezvc8amif.eot');
+  src: url('//at.alicdn.com/t/font_1141042_wbezvc8amif.eot?#iefix') format('embedded-opentype'),
+         url('//at.alicdn.com/t/font_1141042_wbezvc8amif.woff2') format('woff2'),
+         url('//at.alicdn.com/t/font_1141042_wbezvc8amif.woff') format('woff'),
+         url('//at.alicdn.com/t/font_1141042_wbezvc8amif.ttf') format('truetype'),
+         url('//at.alicdn.com/t/font_1141042_wbezvc8amif.svg#iconfont') format('svg');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  font-size: 50rpx;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-change:before {
+  content: '\e618';
+  border: 2px solid #000;
+  border-radius: 50%;
+  font-size: 60rpx;
+}
+
+.btn {
+  width: 80%;
+  border-radius: 25px;
+  background: #000;
+  color: #fff;
+}
+
+.btn-hover {
+  background: #444;
+}
+
+/* view, view::before, view::after {
+  box-sizing: border-box;
+} */
 
 .main-panel {
   background: #fff;
@@ -16,20 +56,11 @@
   z-index: 99;
 }
 
-view, view::before, view::after {
-  box-sizing: border-box;
-}
-
-swiper {
-  background: #179B16;
-}
-
 page {
   height: 100%;
-  /* overflow: hidden; */
 }
 
-.page {
+.page1 {
   color: #000;
   height: 100%;
   position: relative;
@@ -37,7 +68,7 @@ page {
   z-index: -2;
 }
 
-.page::after {
+.page1::after {
   z-index: -1;
   content: "";
   width: 100%;

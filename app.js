@@ -1,7 +1,7 @@
-const util = require('./common/util.js'),
-  constant = require('./common/constant.js');
+const util = require('./common/util.js');
 
 App({
+  /*
   onLaunch: async function(options) {
     // test
     util.setCookie([new util.Cookie({
@@ -29,9 +29,9 @@ App({
       url: 'https://www.12306.cn/index/script/dist/index/main_v10001.js'
     });
     // iconfont 
-    /*util.request({
-       url: 'https://www.12306.cn/index/fonts/iconfont.ttf'
-     });*/
+    // util.request({
+    //    url: 'https://www.12306.cn/index/fonts/iconfont.ttf'
+    //  });
 
     //设置
     util.request({
@@ -60,7 +60,7 @@ App({
     //   }
     // });
 
-  },
+  },*/
   // onShow	Function	生命周期回调—监听小程序显示	小程序启动，或从后台进入前台显示时
   onShow: async function(options) {
 
@@ -77,8 +77,8 @@ App({
   // onPageNotFound	Function	页面不存在监听函数	小程序要打开的页面不存在时触发，会带上页面信息回调该函数
   globalData: {
     LETTERS: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+    MONTH: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'],
     WEEKS: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
-    name: ''
   }
 
 })

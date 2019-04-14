@@ -1,0 +1,17 @@
+<template name="dateLayer">
+  <view class="l-container_full-cover l-animation_transform {{visibleDateLayer?'l-transform_appear':'l-transform_hide'}}" data-property='visibleDateLayer' bindtouchstart="fnMarkTouchPoint" bindtouchend="fnSlideClose">
+    <view class="l-flex l-date_head">
+      <button bindtap='fnPickedDate'>close</button>
+      date
+    </view>
+  </view>
+</template>
+
+<template name="stationLayer">
+  <view class="l-container_full-cover l-animation_transform {{visibleStationLayer?'l-transform_appear':'l-transform_hide'}}" data-property='visibleStationLayer' bindtouchstart="fnMarkTouchPoint" bindtouchend="fnSlideClose">
+    <view class="l-flex l-date_head">
+      <button bindtap='fnPickedStation'>close</button>
+      station
+    </view>
+  </view>
+</template>
