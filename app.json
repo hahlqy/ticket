@@ -1,13 +1,10 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/index/station/station",
-    "pages/index/query/query",
+    "pages/login/login",
     "pages/order/order",
     "pages/mine/mine",
-    "pages/mine/login/login",
-    "pages/mine/question/question",
-    "pages/mine/logs/logs"
+    "pages/logs/logs"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FFF",
@@ -31,20 +28,20 @@
       {
         "pagePath": "pages/index/index",
         "text": "首页",
-        "iconPath": "/assets/home.png",
-        "selectedIconPath": "/assets/home-on.png"
+        "iconPath": "/images/home.png",
+        "selectedIconPath": "/images/home-on.png"
       },
       {
         "pagePath": "pages/order/order",
         "text": "订单",
-        "iconPath": "/assets/order.png",
-        "selectedIconPath": "/assets/order-on.png"
+        "iconPath": "/images/order.png",
+        "selectedIconPath": "/images/order-on.png"
       },
       {
         "pagePath": "pages/mine/mine",
         "text": "我",
-        "iconPath": "/assets/mine.png",
-        "selectedIconPath": "/assets/mine-on.png"
+        "iconPath": "/images/mine.png",
+        "selectedIconPath": "/images/mine-on.png"
       }
     ],
     "position": "bottom",
